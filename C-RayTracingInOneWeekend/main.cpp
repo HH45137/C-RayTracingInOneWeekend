@@ -13,13 +13,14 @@
 * --------------- Typedef ---------------
 */
 
-typedef glm::ivec3 color_t;
+typedef glm::ivec3 icolor_t;
+typedef glm::dvec3 dcolor_t;
 
 /*
 * --------------- Function ---------------
 */
 
-int save2ppm(const char* filename, color_t* fb, int width, int height, int color_depth)
+int save2ppm(const char* filename, icolor_t* fb, int width, int height, int color_depth)
 {
 	FILE* fp = NULL;
 
@@ -51,11 +52,24 @@ int save2ppm(const char* filename, color_t* fb, int width, int height, int color
 	return 0;
 }
 
+dcolor_t render(size_t x, size_t y) 
+{
+	dcolor_t pixel_color{};
+
+	pixel_color = dcolor_t{
+		double(x) / (IMAGE_WIDTH - 1),
+		double(y) / (IMAGE_HEIGHT - 1),
+		double(0.0),
+	};
+
+	return pixel_color;
+}
+
 /*
 * --------------- Global Variable ---------------
 */
 
-color_t* fb_array = NULL;	// Framebuffer
+icolor_t* fb_array = NULL;	// Framebuffer
 
 /*
 * --------------- Main Function ---------------
@@ -68,7 +82,7 @@ int main() {
 	*/
 
 	// Alloc framebuffer array memory
-	fb_array = (color_t*)malloc(IMAGE_PIXEL_NUM * sizeof(color_t));
+	fb_array = (icolor_t*)malloc(IMAGE_PIXEL_NUM * sizeof(icolor_t));
 
 	/*
 	* --------------- Start ---------------
@@ -80,15 +94,13 @@ int main() {
 		for (size_t i = 0; i < IMAGE_WIDTH; i++)
 		{
 			// Calculate RGB values
-			double r = (double)i / (IMAGE_WIDTH - 1);
-			double g = (double)j / (IMAGE_HEIGHT - 1);
-			double b = 0.0;
+			dcolor_t pixel = render(i, j);
 
 			// Clamp to 0~255
 			double tem_color_depth = (double)IMAGE_COLOR_DEPTH + 0.999;
-			int ir = (int)(tem_color_depth * r);
-			int ig = (int)(tem_color_depth * g);
-			int ib = (int)(tem_color_depth * b);
+			int ir = (int)(tem_color_depth * pixel.r);
+			int ig = (int)(tem_color_depth * pixel.g);
+			int ib = (int)(tem_color_depth * pixel.b);
 
 			// Get framebuffer 1D array index
 			size_t fb_idx = j * IMAGE_WIDTH + i;
