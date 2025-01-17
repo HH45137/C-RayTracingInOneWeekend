@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <glm\glm.hpp>
 
 #define IMAGE_WIDTH 256
 #define IMAGE_HEIGHT 256
@@ -13,18 +13,13 @@
 * --------------- Typedef ---------------
 */
 
-typedef struct vec3i_s
-{
-	int r, g, b;
-}vec3i_t;
-
-typedef vec3i_t color_t;
+typedef glm::ivec3 color_t;
 
 /*
 * --------------- Function ---------------
 */
 
-int save2ppm(char* filename, color_t* fb, int width, int height, int color_depth)
+int save2ppm(const char* filename, color_t* fb, int width, int height, int color_depth)
 {
 	FILE* fp = NULL;
 
