@@ -3,18 +3,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <glm\glm.hpp>
+#include "typedef.h"
+#include "ray.h"
 
 #define IMAGE_WIDTH 256
 #define IMAGE_HEIGHT 256
 #define IMAGE_PIXEL_NUM IMAGE_WIDTH * IMAGE_HEIGHT
 #define IMAGE_COLOR_DEPTH 255
-
-/*
-* --------------- Typedef ---------------
-*/
-
-typedef glm::ivec3 icolor_t;
-typedef glm::dvec3 dcolor_t;
 
 /*
 * --------------- Function ---------------
