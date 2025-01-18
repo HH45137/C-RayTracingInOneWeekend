@@ -10,13 +10,31 @@
 * --------------- Global Variable ---------------
 */
 
-const float ASPECT_RATIO = 16.0 / 9.0;
+// Image info
+const auto ASPECT_RATIO = 16.0 / 9.0;
 const int32_t IMAGE_WIDTH = 256;
 const int32_t IMAGE_HEIGHT = IMAGE_WIDTH / ASPECT_RATIO;
 const int32_t IMAGE_PIXEL_NUM = IMAGE_WIDTH * IMAGE_HEIGHT;
 const int32_t IMAGE_COLOR_DEPTH = 255;
 
-icolor_t* fb_array = NULL;	// Framebuffer
+// Camera info
+const auto VIEWPORT_HEIGHT = 2.0;
+const auto VIEWPORT_WIDTH = VIEWPORT_HEIGHT * ASPECT_RATIO;
+auto focal_length = 1.0;
+auto camera_center = dpoint_t(0, 0, 0);
+// Calculate the vectors across the horizontal and down the vertical viewport edges.
+auto viewport_u = dvec3_t(VIEWPORT_WIDTH, 0, 0);
+auto viewport_v = dvec3_t(0, -VIEWPORT_HEIGHT, 0);
+// Calculate the horizontal and vertical delta vectors from pixel to pixel.
+auto pixel_delta_u = viewport_u / (double)IMAGE_WIDTH;
+auto pixel_delta_v = viewport_v / (double)IMAGE_HEIGHT;
+// Calculate the location of the upper left pixel.
+auto viewport_upper_left = camera_center - dvec3_t(0, 0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
+auto pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+
+
+// Framebuffer
+icolor_t* fb_array = NULL;	
 
 /*
 * --------------- Function ---------------
@@ -62,15 +80,20 @@ int init()
 	return 0;
 }
 
+dcolor_t ray_color(ray& r)
+{
+	return dcolor_t{0.0};
+}
+
 dcolor_t render(size_t x, size_t y) 
 {
 	dcolor_t pixel_color{};
 
-	pixel_color = dcolor_t{
-		double(x) / (IMAGE_WIDTH - 1),
-		double(y) / (IMAGE_HEIGHT - 1),
-		double(0.0),
-	};
+	auto pixel_center = pixel00_loc + ((double)x * pixel_delta_u) + ((double)y * pixel_delta_v);
+	auto ray_dir = pixel_center - camera_center;
+
+	ray r(camera_center, pixel_center);
+	pixel_color = ray_color(r);
 
 	return pixel_color;
 }
