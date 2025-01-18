@@ -6,10 +6,17 @@
 #include "typedef.h"
 #include "ray.h"
 
-#define IMAGE_WIDTH 256
-#define IMAGE_HEIGHT 256
-#define IMAGE_PIXEL_NUM IMAGE_WIDTH * IMAGE_HEIGHT
-#define IMAGE_COLOR_DEPTH 255
+/*
+* --------------- Global Variable ---------------
+*/
+
+const float ASPECT_RATIO = 16.0 / 9.0;
+const int32_t IMAGE_WIDTH = 256;
+const int32_t IMAGE_HEIGHT = IMAGE_WIDTH / ASPECT_RATIO;
+const int32_t IMAGE_PIXEL_NUM = IMAGE_WIDTH * IMAGE_HEIGHT;
+const int32_t IMAGE_COLOR_DEPTH = 255;
+
+icolor_t* fb_array = NULL;	// Framebuffer
 
 /*
 * --------------- Function ---------------
@@ -47,6 +54,14 @@ int save2ppm(const char* filename, icolor_t* fb, int width, int height, int colo
 	return 0;
 }
 
+int init() 
+{
+	// Alloc framebuffer array memory
+	fb_array = (icolor_t*)malloc(IMAGE_PIXEL_NUM * sizeof(icolor_t));
+
+	return 0;
+}
+
 dcolor_t render(size_t x, size_t y) 
 {
 	dcolor_t pixel_color{};
@@ -61,12 +76,6 @@ dcolor_t render(size_t x, size_t y)
 }
 
 /*
-* --------------- Global Variable ---------------
-*/
-
-icolor_t* fb_array = NULL;	// Framebuffer
-
-/*
 * --------------- Main Function ---------------
 */
 
@@ -76,8 +85,7 @@ int main() {
 	* --------------- Init ---------------
 	*/
 
-	// Alloc framebuffer array memory
-	fb_array = (icolor_t*)malloc(IMAGE_PIXEL_NUM * sizeof(icolor_t));
+	init();
 
 	/*
 	* --------------- Start ---------------
