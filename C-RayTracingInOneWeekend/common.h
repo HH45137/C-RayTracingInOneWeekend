@@ -18,3 +18,4 @@ typedef dvec3_t dpoint_t;
 #define NORMALIZE glm::normalize
 #define DOT glm::dot
 #define SQRT glm::sqrt
+#define LENGTH_SQUARED(v) glm::dot(v, v)

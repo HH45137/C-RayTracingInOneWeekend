@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <glm\glm.hpp>
 #include "common.h"
 #include "ray.h"
 
@@ -83,10 +82,10 @@ int init()
 double hit_sphere(const dpoint_t& center, double radius, const ray& r) 
 {
 	dvec3_t oc = center - r.origin;
-	auto a = DOT(r.direction, r.direction);
-	auto b = -2.0 * DOT(r.direction, oc);
-	auto c = DOT(oc, oc) - radius * radius;
-	auto discriminant = b * b - 4 * a * c;
+	auto a = LENGTH_SQUARED(r.direction);
+	auto h = DOT(r.direction, oc);
+	auto c = LENGTH_SQUARED(oc) - radius * radius;
+	auto discriminant = h * h - a * c;
 
 	if (discriminant < 0)
 	{
@@ -94,7 +93,7 @@ double hit_sphere(const dpoint_t& center, double radius, const ray& r)
 	}
 	else
 	{
-		return (-b - SQRT(discriminant)) / (2.0 * a);
+		return (h - SQRT(discriminant)) / a;
 	}
 }
 
