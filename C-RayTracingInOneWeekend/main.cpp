@@ -82,7 +82,9 @@ int init()
 
 dcolor_t ray_color(ray& r)
 {
-	return dcolor_t{0.0};
+	dvec3_t unit_dir = glm::normalize(r.direction);
+	auto a = 0.5 * (unit_dir.y + 1.0);
+	return (1.0 - a) * dcolor_t { 1.0 } + a * dcolor_t{ .5,.7,1.0 };
 }
 
 dcolor_t render(size_t x, size_t y) 

@@ -5,10 +5,11 @@
 class ray
 {
 private:
+
+public:
 	dpoint_t origin;
 	dvec3_t direction;
 
-public:
 	ray();
 	
 	ray(const dpoint_t& ori, const dvec3_t dir);
