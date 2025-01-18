@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <glm\glm.hpp>
-#include "typedef.h"
+#include "common.h"
 #include "ray.h"
 
 /*
@@ -80,11 +80,35 @@ int init()
 	return 0;
 }
 
+bool hit_sphere(const dpoint_t& center, double radius, const ray& r) 
+{
+	dvec3_t oc = center - r.origin;
+	auto a = DOT(r.direction, r.direction);
+	auto b = -2.0 * DOT(r.direction, oc);
+	auto c = DOT(oc, oc) - radius * radius;
+	auto discriminant = b * b - 4 * a * c;
+	return (discriminant >= 0);
+}
+
 dcolor_t ray_color(ray& r)
 {
-	dvec3_t unit_dir = glm::normalize(r.direction);
+	dcolor_t pixel{};
+
+	// Claculate sphere pixel
+	if (hit_sphere(dpoint_t(0, 0, -1), .5, r))
+	{
+		return dcolor_t(1, 0, 0);
+	}
+
+	// Calculate background pixel
+	dvec3_t unit_dir = NORMALIZE(r.direction);
 	auto a = 0.5 * (unit_dir.y + 1.0);
-	return (1.0 - a) * dcolor_t { 1.0 } + a * dcolor_t{ .5,.7,1.0 };
+	dcolor_t background = (1.0 - a) * dcolor_t { 1.0 } + a * dcolor_t{ .5,.7,1.0 };
+
+	// blend all
+	pixel = background;
+
+	return pixel;
 }
 
 dcolor_t render(size_t x, size_t y) 
