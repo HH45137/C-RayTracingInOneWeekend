@@ -41,5 +41,8 @@
     <ClInclude Include="sphere.h">
       <Filter>头文件\objects</Filter>
     </ClInclude>
+    <ClInclude Include="hit_table_list.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
