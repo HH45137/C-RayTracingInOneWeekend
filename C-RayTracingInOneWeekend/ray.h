@@ -14,6 +14,6 @@ public:
 	
 	ray(const dpoint_t& ori, const dvec3_t dir);
 
-	dpoint_t at(double t);
+	dpoint_t at(double t) const;
 
 };

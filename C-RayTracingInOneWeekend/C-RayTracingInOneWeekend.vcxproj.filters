@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\objects">
+      <UniqueIdentifier>{bf837df2-9a85-4791-8181-0b860fc9dc85}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -31,6 +34,12 @@
     </ClInclude>
     <ClInclude Include="common.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="hit_table.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sphere.h">
+      <Filter>头文件\objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

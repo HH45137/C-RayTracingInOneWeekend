@@ -19,3 +19,4 @@ typedef dvec3_t dpoint_t;
 #define DOT glm::dot
 #define SQRT glm::sqrt
 #define LENGTH_SQUARED(v) glm::dot(v, v)
+#define MAX glm::max
