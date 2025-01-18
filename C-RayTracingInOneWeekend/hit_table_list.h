@@ -2,11 +2,6 @@
 
 #include "hit_table.h"
 
-#include <memory>
-#include <vector>
-
-using std::make_shared;
-using std::shared_ptr;
 
 class hit_table_list : hit_table
 {
