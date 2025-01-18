@@ -80,14 +80,22 @@ int init()
 	return 0;
 }
 
-bool hit_sphere(const dpoint_t& center, double radius, const ray& r) 
+double hit_sphere(const dpoint_t& center, double radius, const ray& r) 
 {
 	dvec3_t oc = center - r.origin;
 	auto a = DOT(r.direction, r.direction);
 	auto b = -2.0 * DOT(r.direction, oc);
 	auto c = DOT(oc, oc) - radius * radius;
 	auto discriminant = b * b - 4 * a * c;
-	return (discriminant >= 0);
+
+	if (discriminant < 0)
+	{
+		return -1.0;
+	}
+	else
+	{
+		return (-b - SQRT(discriminant)) / (2.0 * a);
+	}
 }
 
 dcolor_t ray_color(ray& r)
@@ -95,18 +103,24 @@ dcolor_t ray_color(ray& r)
 	dcolor_t pixel{};
 
 	// Claculate sphere pixel
-	if (hit_sphere(dpoint_t(0, 0, -1), .5, r))
+	dcolor_t sphere_color{};
+	dpoint_t sphere_position{ 0, 0, -1 };
+	auto t = hit_sphere(sphere_position, .5, r);
+	if (t > 0.0)
 	{
-		return dcolor_t(1, 0, 0);
+		dvec3_t normal = NORMALIZE(r.at(t) - sphere_position);
+		sphere_color = 0.5 * (normal + 1.0);
+		return sphere_color;
 	}
 
 	// Calculate background pixel
+	dcolor_t background_color{};
 	dvec3_t unit_dir = NORMALIZE(r.direction);
 	auto a = 0.5 * (unit_dir.y + 1.0);
-	dcolor_t background = (1.0 - a) * dcolor_t { 1.0 } + a * dcolor_t{ .5,.7,1.0 };
+	background_color = (1.0 - a) * dcolor_t { 1.0 } + a * dcolor_t{ .5,.7,1.0 };
 
 	// blend all
-	pixel = background;
+	pixel = background_color;
 
 	return pixel;
 }
