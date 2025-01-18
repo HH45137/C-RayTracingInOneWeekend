@@ -7,7 +7,7 @@ class sphere : public hit_table
 public:
 	sphere(const dpoint_t& center, double radius, const ray& r);
 
-	bool hit(const ray& r, double ray_t_min, double ray_t_max, hit_record& rec) const override;
+	bool hit(ray& r, double ray_t_min, double ray_t_max, hit_record& rec) const override;
 
 private:
 	dpoint_t center;
@@ -18,7 +18,7 @@ sphere::sphere(const dpoint_t& center, double radius, const ray& r) : center(cen
 {
 }
 
-bool sphere::hit(const ray& r, double ray_t_min, double ray_t_max, hit_record& rec) const
+bool sphere::hit(ray& r, double ray_t_min, double ray_t_max, hit_record& rec) const
 {
 	dvec3_t oc = center - r.origin;
 	auto a = LENGTH_SQUARED(r.direction);
