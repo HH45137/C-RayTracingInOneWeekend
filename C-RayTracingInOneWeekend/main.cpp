@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include "common.h"
 #include "ray.h"
+#include "hit_table_list.h"
+#include "sphere.h"
+
 
 /*
 * --------------- Global Variable ---------------
@@ -33,7 +36,10 @@ auto pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
 
 // Framebuffer
-icolor_t* fb_array = NULL;	
+icolor_t* fb_array = NULL;
+
+// World (All objects)
+hit_table_list world;
 
 /*
 * --------------- Function ---------------
@@ -76,39 +82,25 @@ int init()
 	// Alloc framebuffer array memory
 	fb_array = (icolor_t*)malloc(IMAGE_PIXEL_NUM * sizeof(icolor_t));
 
+	// Add objects into world
+	{
+		world.add(make_shared<sphere>(dpoint_t{ 0,0,-1 }, .5));
+		world.add(make_shared<sphere>(dpoint_t{ 0,-100.5,-1 }, 100.0));
+	}
+
 	return 0;
 }
 
-double hit_sphere(const dpoint_t& center, double radius, const ray& r) 
-{
-	dvec3_t oc = center - r.origin;
-	auto a = LENGTH_SQUARED(r.direction);
-	auto h = DOT(r.direction, oc);
-	auto c = LENGTH_SQUARED(oc) - radius * radius;
-	auto discriminant = h * h - a * c;
-
-	if (discriminant < 0)
-	{
-		return -1.0;
-	}
-	else
-	{
-		return (h - SQRT(discriminant)) / a;
-	}
-}
-
-dcolor_t ray_color(ray& r)
+dcolor_t ray_color(ray& r, const hit_table& world)
 {
 	dcolor_t pixel{};
 
 	// Claculate sphere pixel
 	dcolor_t sphere_color{};
-	dpoint_t sphere_position{ 0, 0, -1 };
-	auto t = hit_sphere(sphere_position, .5, r);
-	if (t > 0.0)
+	hit_record rec;
+	if (world.hit(r, 0.0, INFINITY_DOUBLE, rec))
 	{
-		dvec3_t normal = NORMALIZE(r.at(t) - sphere_position);
-		sphere_color = 0.5 * (normal + 1.0);
+		sphere_color = 0.5 * (rec.normal + dcolor_t{ 1 });
 		return sphere_color;
 	}
 
@@ -132,7 +124,7 @@ dcolor_t render(size_t x, size_t y)
 	auto ray_dir = pixel_center - camera_center;
 
 	ray r(camera_center, pixel_center);
-	pixel_color = ray_color(r);
+	pixel_color = ray_color(r, world);
 
 	return pixel_color;
 }

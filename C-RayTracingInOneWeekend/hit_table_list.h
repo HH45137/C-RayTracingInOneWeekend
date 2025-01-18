@@ -3,7 +3,7 @@
 #include "hit_table.h"
 
 
-class hit_table_list : hit_table
+class hit_table_list : public hit_table
 {
 public:
 	std::vector<shared_ptr<hit_table>> objects;

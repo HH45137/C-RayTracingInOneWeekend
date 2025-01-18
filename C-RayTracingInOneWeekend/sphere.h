@@ -5,7 +5,7 @@
 class sphere : public hit_table
 {
 public:
-	sphere(const dpoint_t& center, double radius, const ray& r);
+	sphere(const dpoint_t& center, double radius);
 
 	bool hit(ray& r, double ray_t_min, double ray_t_max, hit_record& rec) const override;
 
@@ -14,7 +14,7 @@ private:
 	double radius;
 };
 
-sphere::sphere(const dpoint_t& center, double radius, const ray& r) : center(center), radius(MAX(0.0, radius))
+sphere::sphere(const dpoint_t& center, double radius) : center(center), radius(MAX(0.0, radius))
 {
 }
 
