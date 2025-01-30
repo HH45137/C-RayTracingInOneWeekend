@@ -7,15 +7,15 @@ class camera
 {
 public:
 	// Image info
-	double ASPECT_RATIO;
-	int32_t IMAGE_WIDTH;
-	int32_t IMAGE_HEIGHT;
-	int32_t IMAGE_PIXEL_NUM;
-	int32_t IMAGE_COLOR_DEPTH;
+	double aspect_ratio = 16.0 / 9.0;
+	int32_t image_width = 512;
+	int32_t image_height;
+	int32_t image_pixel_count;
+	int32_t image_bit_depth;
 
 	// Camera info
-	double VIEWPORT_HEIGHT;
-	double VIEWPORT_WIDTH;
+	double viewport_height;
+	double viewport_width;
 	double focal_length;
 	dpoint_t camera_center;
 	// Calculate the vectors across the horizontal and down the vertical viewport edges.
@@ -35,30 +35,44 @@ public:
 	int32_t samples_per_pixel;
 	double pixel_samples_scale;
 
+	// Ray info
+	int32_t max_depth = 10;
+
 	void render(hit_table& world);
 
-	camera(int32_t image_w, double image_aspect_ratio, int32_t samples);
+	camera();
 	~camera();
 
 private:
-	void initialize(int32_t image_w, double image_aspect_ratio, int32_t samples);
+	void initialize();
 
 	void clean();
 
-	dcolor_t ray_color(ray& r, hit_table& world);
+	dcolor_t ray_color(ray& r, int32_t depth, hit_table& world);
 
 	int save2ppm(const char* filename, icolor_t* fb, int width, int height, int color_depth);
 
 	ray gen_ray(int32_t i, int32_t j);
 };
 
+camera::camera()
+{
+}
+
+camera::~camera()
+{
+	this->clean();
+}
+
 void camera::render(hit_table& world)
 {
+	this->initialize();
+
 	printf("Rendering image....\n");
 	// Main loop
-	for (size_t j = 0; j < IMAGE_HEIGHT; j++)
+	for (size_t j = 0; j < image_height; j++)
 	{
-		for (size_t i = 0; i < IMAGE_WIDTH; i++)
+		for (size_t i = 0; i < image_width; i++)
 		{
 			dcolor_t pixel{ 0 };
 
@@ -66,18 +80,18 @@ void camera::render(hit_table& world)
 			for (size_t sample = 0; sample < samples_per_pixel; sample++)
 			{
 				ray r = gen_ray(i, j);
-				pixel += ray_color(r, world);
+				pixel += ray_color(r, max_depth, world);
 			}
 			pixel *= pixel_samples_scale;
 
 			// Clamp to 0~255
-			double tem_color_depth = (double)IMAGE_COLOR_DEPTH + 0.999;
+			double tem_color_depth = (double)image_bit_depth + 0.999;
 			int ir = (int)(tem_color_depth * pixel.r);
 			int ig = (int)(tem_color_depth * pixel.g);
 			int ib = (int)(tem_color_depth * pixel.b);
 
 			// Get framebuffer 1D array index
-			size_t fb_idx = j * IMAGE_WIDTH + i;
+			size_t fb_idx = j * image_width + i;
 
 			// Set framebuffer pixel RGB values
 			fb_array[fb_idx].r = ir;
@@ -93,47 +107,34 @@ void camera::render(hit_table& world)
 
 	printf("Saveing image....\n");
 	// Save framebuffer to PPM image
-	save2ppm("./output.ppm", fb_array, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_COLOR_DEPTH);
+	save2ppm("./output.ppm", fb_array, image_width, image_height, image_bit_depth);
 	printf("Save image done.\n");
 }
 
-camera::camera(int32_t image_w, double image_aspect_ratio, int32_t samples)
+void camera::initialize()
 {
-	this->initialize(image_w, image_aspect_ratio, samples);
-}
+	image_height = image_width / aspect_ratio;
+	image_pixel_count = image_width * image_height;
+	image_bit_depth = 255;
 
-camera::~camera()
-{
-	this->clean();
-}
-
-void camera::initialize(int32_t image_w, double image_aspect_ratio, int32_t samples)
-{
-	ASPECT_RATIO = image_aspect_ratio;
-	IMAGE_WIDTH = image_w;
-	IMAGE_HEIGHT = IMAGE_WIDTH / ASPECT_RATIO;
-	IMAGE_PIXEL_NUM = IMAGE_WIDTH * IMAGE_HEIGHT;
-	IMAGE_COLOR_DEPTH = 255;
-
-	VIEWPORT_HEIGHT = 2.0;
-	VIEWPORT_WIDTH = VIEWPORT_HEIGHT * ASPECT_RATIO;
+	viewport_height = 2.0;
+	viewport_width = viewport_height * aspect_ratio;
 	focal_length = 1.0;
 	camera_center = dpoint_t(0, 0, 0);
 
-	viewport_u = dvec3_t(VIEWPORT_WIDTH, 0, 0);
-	viewport_v = dvec3_t(0, -VIEWPORT_HEIGHT, 0);
+	viewport_u = dvec3_t(viewport_width, 0, 0);
+	viewport_v = dvec3_t(0, -viewport_height, 0);
 
-	pixel_delta_u = viewport_u / (double)IMAGE_WIDTH;
-	pixel_delta_v = viewport_v / (double)IMAGE_HEIGHT;
+	pixel_delta_u = viewport_u / (double)image_width;
+	pixel_delta_v = viewport_v / (double)image_height;
 
 	viewport_upper_left = camera_center - dvec3_t(0, 0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
 	pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
-	samples_per_pixel = samples;
 	pixel_samples_scale = 1.0 / samples_per_pixel;
 
 	// Alloc framebuffer array memory
-	fb_array = (icolor_t*)malloc(IMAGE_PIXEL_NUM * sizeof(icolor_t));
+	fb_array = (icolor_t*)malloc(image_pixel_count * sizeof(icolor_t));
 }
 
 void camera::clean()
@@ -142,9 +143,14 @@ void camera::clean()
 	free(fb_array);
 }
 
-dcolor_t camera::ray_color(ray& r, hit_table& world)
+dcolor_t camera::ray_color(ray& r, int32_t depth, hit_table& world)
 {
-	dcolor_t pixel{};
+	dcolor_t pixel{ 0 };
+
+	if (depth <= 0)
+	{
+		return pixel;
+	}
 
 	// Claculate sphere pixel
 	dcolor_t sphere_color{};
@@ -153,7 +159,7 @@ dcolor_t camera::ray_color(ray& r, hit_table& world)
 	{
 		dvec3_t dir = random_on_halfsphere(rec.normal);
 		ray new_ray = ray(rec.p, dir);
-		sphere_color = 0.5 * ray_color(new_ray, world);
+		sphere_color = 0.5 * ray_color(new_ray, depth - 1, world);
 		return sphere_color;
 	}
 

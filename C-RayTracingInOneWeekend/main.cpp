@@ -16,7 +16,11 @@ int main() {
 	world.add(make_shared<sphere>(dpoint_t{ 0,0,-1 }, .5));
 	world.add(make_shared<sphere>(dpoint_t{ 0,-100.5,-1 }, 100.0));
 
-	camera camera01{ 512, 16.0 / 9.0 ,100 };
+	camera camera01{};
+	camera01.image_width = 640;
+	camera01.aspect_ratio = 16.0 / 9.0;
+	camera01.samples_per_pixel = 8;
+	camera01.max_depth = 50;
 
 	camera01.render(world);
 
