@@ -16,7 +16,7 @@ public:
 	void add(shared_ptr<hit_table> object);
 	void clear();
 
-	bool hit(ray& r, double ray_t_min, double ray_t_max, hit_record& rec) const override;
+	bool hit(ray& r, interval ray_t, hit_record& rec) const override;
 
 };
 
@@ -38,15 +38,15 @@ void hit_table_list::clear()
 	this->objects.clear();
 }
 
-bool hit_table_list::hit(ray& r, double ray_t_min, double ray_t_max, hit_record& rec) const
+bool hit_table_list::hit(ray& r, interval ray_t, hit_record& rec) const
 {
 	hit_record tem_rec;
 	bool hit_any = false;
-	auto closest_so_far = ray_t_max;
+	auto closest_so_far = ray_t.max;
 
 	for (const auto& obj : this->objects)
 	{
-		if (obj->hit(r, ray_t_min, closest_so_far, tem_rec))
+		if (obj->hit(r, interval(ray_t.min, closest_so_far), tem_rec))
 		{
 			hit_any = true;
 			closest_so_far = tem_rec.t;

@@ -24,6 +24,9 @@
     <ClCompile Include="ray.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="interval.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -42,6 +45,9 @@
       <Filter>头文件\objects</Filter>
     </ClInclude>
     <ClInclude Include="hit_table_list.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="interval.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

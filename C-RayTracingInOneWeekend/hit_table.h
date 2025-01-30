@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ray.h"
+#include "interval.h"
 
 class hit_record
 {
@@ -28,7 +29,7 @@ class hit_table
 public:
 	virtual ~hit_table() = default;
 
-	virtual bool hit(ray& r, double ray_t_min, double ray_t_max, hit_record& rec) const = 0;
+	virtual bool hit(ray& r, interval ray_t, hit_record& rec) const = 0;
 
 private:
 

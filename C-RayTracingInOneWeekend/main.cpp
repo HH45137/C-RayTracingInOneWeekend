@@ -98,7 +98,7 @@ dcolor_t ray_color(ray& r, const hit_table& world)
 	// Claculate sphere pixel
 	dcolor_t sphere_color{};
 	hit_record rec;
-	if (world.hit(r, 0.0, INFINITY_DOUBLE, rec))
+	if (world.hit(r, interval(0.0, INFINITY_DOUBLE), rec))
 	{
 		sphere_color = 0.5 * (rec.normal + dcolor_t{ 1 });
 		return sphere_color;
