@@ -19,6 +19,8 @@ public:
 
 	bool surrounds(double x);
 
+	double clamp(double x);
+
 private:
 
 };
@@ -40,3 +42,10 @@ double interval::size() { return max - min; }
 bool interval::contains(double x) { return min <= x && x <= max; }
 
 bool interval::surrounds(double x) { return min < x&& x < max; }
+
+double interval::clamp(double x)
+{
+	if (x < min) return min;
+	if (x > max) return max;
+	return x;
+}

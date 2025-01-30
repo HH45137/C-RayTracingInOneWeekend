@@ -31,6 +31,10 @@ public:
 	// Framebuffer
 	icolor_t* fb_array = NULL;
 
+	// MSAA info
+	int32_t samples_per_pixel;
+	double pixel_samples_scale;
+
 	void render(hit_table& world);
 
 	camera(int32_t image_w, double image_aspect_ratio);
@@ -44,6 +48,8 @@ private:
 	dcolor_t ray_color(ray& r, hit_table& world);
 
 	int save2ppm(const char* filename, icolor_t* fb, int width, int height, int color_depth);
+
+	ray gen_ray(int32_t i, int32_t j);
 };
 
 void camera::render(hit_table& world)
@@ -54,11 +60,15 @@ void camera::render(hit_table& world)
 	{
 		for (size_t i = 0; i < IMAGE_WIDTH; i++)
 		{
+			dcolor_t pixel{ 0 };
+
 			// Calculate RGB values
-			auto pixel_center = pixel00_loc + ((double)i * pixel_delta_u) + ((double)j * pixel_delta_v);
-			auto ray_dir = pixel_center - camera_center;
-			ray r(camera_center, pixel_center);
-			dcolor_t pixel = ray_color(r, world);
+			for (size_t sample = 0; sample < samples_per_pixel; sample++)
+			{
+				ray r = gen_ray(i, j);
+				pixel += ray_color(r, world);
+			}
+			pixel *= pixel_samples_scale;
 
 			// Clamp to 0~255
 			double tem_color_depth = (double)IMAGE_COLOR_DEPTH + 0.999;
@@ -118,6 +128,9 @@ void camera::initialize(int32_t image_w, double image_aspect_ratio)
 
 	viewport_upper_left = camera_center - dvec3_t(0, 0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
 	pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+
+	samples_per_pixel = 8;
+	pixel_samples_scale = 1.0 / samples_per_pixel;
 
 	// Alloc framebuffer array memory
 	fb_array = (icolor_t*)malloc(IMAGE_PIXEL_NUM * sizeof(icolor_t));
@@ -184,4 +197,17 @@ int camera::save2ppm(const char* filename, icolor_t* fb, int width, int height, 
 	fclose(fp);
 
 	return 0;
+}
+
+ray camera::gen_ray(int32_t i, int32_t j)
+{
+	auto offset = sample_square();
+	auto pixel_sample_point =
+		pixel00_loc
+		+ (((double)i + offset.x) * pixel_delta_u)
+		+ (((double)j + offset.y) * pixel_delta_v);
+	
+	ray r(camera_center, pixel_sample_point - camera_center);
+
+	return r;
 }

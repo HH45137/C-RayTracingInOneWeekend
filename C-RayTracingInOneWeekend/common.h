@@ -6,6 +6,7 @@
 #include <vector>
 #include <cmath>
 #include <limits>
+#include <cstdlib>
 
 
 /*
@@ -40,3 +41,22 @@ typedef dvec3_t dpoint_t;
 
 const double INFINITY_DOUBLE = std::numeric_limits<double>::infinity();
 const double PI_DOUBLE = 3.1415926535897932385;
+
+/*
+* --------------- Function ---------------
+*/
+
+static double random_double()
+{
+	return std::rand() / (RAND_MAX + 1.0);
+}
+
+static double random_double(double min, double max)
+{
+	return min + (max - min) * random_double();
+}
+
+static dvec3_t sample_square() 
+{
+	return dvec3_t(random_double() - 0.5, random_double() - 0.5, 0);
+}
