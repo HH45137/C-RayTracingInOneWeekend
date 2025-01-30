@@ -60,3 +60,38 @@ static dvec3_t sample_square()
 {
 	return dvec3_t(random_double() - 0.5, random_double() - 0.5, 0);
 }
+
+static dvec3_t random_vec3()
+{
+	return dvec3_t(random_double(), random_double(), random_double());
+}
+
+static dvec3_t random_vec3(double min, double max)
+{
+	return dvec3_t(random_double(min, max), random_double(min, max), random_double(min, max));
+}
+
+static dvec3_t random_unit_vector() 
+{
+	while (true) {
+		auto p = random_vec3(-1, 1);
+		auto lensq = LENGTH_SQUARED(p);
+		if (1e-160 < lensq && lensq <= 1)
+		{
+			return p / SQRT(lensq);
+		}
+	}
+}
+
+static dvec3_t random_on_halfsphere(dvec3_t& normal)
+{
+	dvec3_t on_unit_sphere = random_unit_vector();
+	if (DOT(on_unit_sphere, normal) > 0.0)
+	{
+		return on_unit_sphere;
+	}
+	else
+	{
+		return -on_unit_sphere;
+	}
+}

@@ -37,11 +37,11 @@ public:
 
 	void render(hit_table& world);
 
-	camera(int32_t image_w, double image_aspect_ratio);
+	camera(int32_t image_w, double image_aspect_ratio, int32_t samples);
 	~camera();
 
 private:
-	void initialize(int32_t image_w, double image_aspect_ratio);
+	void initialize(int32_t image_w, double image_aspect_ratio, int32_t samples);
 
 	void clean();
 
@@ -85,7 +85,7 @@ void camera::render(hit_table& world)
 			fb_array[fb_idx].b = ib;
 
 #ifdef _DEBUG
-			printf("fb_idx = %zd \t ir = %d \t ig = %d \t ib = %d \n", fb_idx, ir, ig, ib);
+			//printf("fb_idx = %zd \t ir = %d \t ig = %d \t ib = %d \n", fb_idx, ir, ig, ib);
 #endif
 		}
 	}
@@ -97,9 +97,9 @@ void camera::render(hit_table& world)
 	printf("Save image done.\n");
 }
 
-camera::camera(int32_t image_w, double image_aspect_ratio)
+camera::camera(int32_t image_w, double image_aspect_ratio, int32_t samples)
 {
-	this->initialize(image_w, image_aspect_ratio);
+	this->initialize(image_w, image_aspect_ratio, samples);
 }
 
 camera::~camera()
@@ -107,7 +107,7 @@ camera::~camera()
 	this->clean();
 }
 
-void camera::initialize(int32_t image_w, double image_aspect_ratio)
+void camera::initialize(int32_t image_w, double image_aspect_ratio, int32_t samples)
 {
 	ASPECT_RATIO = image_aspect_ratio;
 	IMAGE_WIDTH = image_w;
@@ -129,7 +129,7 @@ void camera::initialize(int32_t image_w, double image_aspect_ratio)
 	viewport_upper_left = camera_center - dvec3_t(0, 0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
 	pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
-	samples_per_pixel = 8;
+	samples_per_pixel = samples;
 	pixel_samples_scale = 1.0 / samples_per_pixel;
 
 	// Alloc framebuffer array memory
@@ -151,7 +151,9 @@ dcolor_t camera::ray_color(ray& r, hit_table& world)
 	hit_record rec;
 	if (world.hit(r, interval(0.0, INFINITY_DOUBLE), rec))
 	{
-		sphere_color = 0.5 * (rec.normal + dcolor_t{ 1 });
+		dvec3_t dir = random_on_halfsphere(rec.normal);
+		ray new_ray = ray(rec.p, dir);
+		sphere_color = 0.5 * ray_color(new_ray, world);
 		return sphere_color;
 	}
 

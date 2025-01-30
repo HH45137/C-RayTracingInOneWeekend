@@ -16,7 +16,7 @@ int main() {
 	world.add(make_shared<sphere>(dpoint_t{ 0,0,-1 }, .5));
 	world.add(make_shared<sphere>(dpoint_t{ 0,-100.5,-1 }, 100.0));
 
-	camera camera01{ 512, 16.0 / 9.0 };
+	camera camera01{ 512, 16.0 / 9.0 ,100 };
 
 	camera01.render(world);
 
