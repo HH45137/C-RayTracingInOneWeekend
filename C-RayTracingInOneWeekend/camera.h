@@ -155,7 +155,7 @@ dcolor_t camera::ray_color(ray& r, int32_t depth, hit_table& world)
 	// Claculate sphere pixel
 	dcolor_t sphere_color{};
 	hit_record rec;
-	if (world.hit(r, interval(0.0, INFINITY_DOUBLE), rec))
+	if (world.hit(r, interval(0.001, INFINITY_DOUBLE), rec))
 	{
 		dvec3_t dir = random_on_halfsphere(rec.normal);
 		ray new_ray = ray(rec.p, dir);
