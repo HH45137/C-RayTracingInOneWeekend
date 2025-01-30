@@ -95,3 +95,13 @@ static dvec3_t random_on_halfsphere(dvec3_t& normal)
 		return -on_unit_sphere;
 	}
 }
+
+static double linear_to_gamma(double linear_component)
+{
+	if (linear_component > 0)
+	{
+		return SQRT(linear_component);
+	}
+
+	return 0;
+}

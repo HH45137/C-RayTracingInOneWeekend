@@ -86,9 +86,9 @@ void camera::render(hit_table& world)
 
 			// Clamp to 0~255
 			double tem_color_depth = (double)image_bit_depth + 0.999;
-			int ir = (int)(tem_color_depth * pixel.r);
-			int ig = (int)(tem_color_depth * pixel.g);
-			int ib = (int)(tem_color_depth * pixel.b);
+			int ir = (int)(tem_color_depth * linear_to_gamma(pixel.r));
+			int ig = (int)(tem_color_depth * linear_to_gamma(pixel.g));
+			int ib = (int)(tem_color_depth * linear_to_gamma(pixel.b));
 
 			// Get framebuffer 1D array index
 			size_t fb_idx = j * image_width + i;
@@ -157,9 +157,9 @@ dcolor_t camera::ray_color(ray& r, int32_t depth, hit_table& world)
 	hit_record rec;
 	if (world.hit(r, interval(0.001, INFINITY_DOUBLE), rec))
 	{
-		dvec3_t dir = random_on_halfsphere(rec.normal);
+		dvec3_t dir = rec.normal + random_unit_vector();
 		ray new_ray = ray(rec.p, dir);
-		sphere_color = 0.5 * ray_color(new_ray, depth - 1, world);
+		sphere_color = 0.2 * ray_color(new_ray, depth - 1, world);
 		return sphere_color;
 	}
 
