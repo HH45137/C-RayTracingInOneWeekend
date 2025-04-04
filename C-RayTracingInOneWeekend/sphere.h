@@ -5,16 +5,17 @@
 class sphere : public hit_table
 {
 public:
-	sphere(const dpoint_t& center, double radius);
+	sphere(const dpoint_t& center, double radius, shared_ptr<material> mat);
 
 	bool hit(ray& r, interval ray_t, hit_record& rec) const override;
 
 private:
 	dpoint_t center;
 	double radius;
+	shared_ptr<material> mat;
 };
 
-sphere::sphere(const dpoint_t& center, double radius) : center(center), radius(MAX(0.0, radius))
+sphere::sphere(const dpoint_t& center, double radius, shared_ptr<material> mat) : center(center), radius(MAX(0.0, radius)), mat(mat)
 {
 }
 
@@ -48,6 +49,7 @@ bool sphere::hit(ray& r, interval ray_t, hit_record& rec) const
 	rec.p = r.at(rec.t);
 	dvec3_t outward_normal = (rec.p - center) / radius;
 	rec.set_face_normal(r, outward_normal);
+	rec.mat = mat;
 
 	return true;
 }

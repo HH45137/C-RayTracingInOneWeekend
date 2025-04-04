@@ -105,3 +105,13 @@ static double linear_to_gamma(double linear_component)
 
 	return 0;
 }
+
+static bool near_zero_vector(dvec3_t vec) {
+	auto s = 1e-8;
+	return (std::fabs(vec[0] < s) && std::fabs(vec[1] < s) && std::fabs(vec[2] < s));
+}
+
+// 得到一根光线的反射方向的向量
+static dvec3_t reflect(const dvec3_t& v, const dvec3_t& n) {
+	return v - 2 * DOT(v, n) * n;
+}

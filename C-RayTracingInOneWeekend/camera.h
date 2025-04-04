@@ -157,10 +157,17 @@ dcolor_t camera::ray_color(ray& r, int32_t depth, hit_table& world)
 	hit_record rec;
 	if (world.hit(r, interval(0.001, INFINITY_DOUBLE), rec))
 	{
-		dvec3_t dir = rec.normal + random_unit_vector();
-		ray new_ray = ray(rec.p, dir);
-		sphere_color = 0.2 * ray_color(new_ray, depth - 1, world);
-		return sphere_color;
+		//	dvec3_t dir = rec.normal + random_unit_vector();
+		//	ray new_ray = ray(rec.p, dir);
+		//	sphere_color = 0.2 * ray_color(new_ray, depth - 1, world);
+		//	return sphere_color;
+
+		ray scattered{};
+		dcolor_t attenuation;
+		if (rec.mat->scatter(r, rec, attenuation, scattered)) {
+			attenuation* ray_color(scattered, depth - 1, world);
+		}
+		return dcolor_t{ 0.0 };
 	}
 
 	// Calculate background pixel

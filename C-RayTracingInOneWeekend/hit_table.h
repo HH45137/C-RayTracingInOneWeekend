@@ -2,6 +2,9 @@
 
 #include "ray.h"
 #include "interval.h"
+#include "material.h"
+
+class material;
 
 class hit_record
 {
@@ -10,6 +13,7 @@ public:
 	dvec3_t normal;
 	double t;
 	bool front_face;
+	shared_ptr<material> mat;
 
 	void set_face_normal(ray& r, const dvec3_t outward_normal);
 
